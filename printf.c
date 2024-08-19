@@ -2,57 +2,38 @@
 
 int _printf(const char *format, ...)
 {
-   
-    char c;
-    char *str;
     va_list args;
-    int conteo = 0;
-    if (format == NULL)
-    {
-        return -1;
-    }
+    int i = 0, printed_chars = 0;
+    char *str, c;
     va_start(args, format);
-    while (*format)
-    {
-        if (*format == '%')
-        {
-            format++;
-            switch (*format)
-            {
-            case 'c':
-                c = va_arg(args, int);
-                _putchar(c);
-                conteo++;
-                break;
-            case 's':
-                str = va_arg (args, char*);
-                if (str == NULL)
-                {
-                    while (*str)
-                    {
-                        _putchar(*str);
-                        str++;
-                        conteo++;
-                    }
-                }
-                break;
-            case '%':
-                _putchar('%');
-                conteo++;
-                break;
-            default:
-                _putchar('%');
-                _putchar(*format);
-                conteo += 2;
-                break;
+    while (format && format[i]) {
+        if (format[i] == '%') {
+            i++;
+            switch (format[i]) {
+                case 'c':
+                    c = va_arg(args, int);
+                    printed_chars += write(1, &c, 1);
+                    break;
+                case 's':
+                    str = va_arg(args, char *);
+                    if (!str)
+                        str = "(null)";
+                    printed_chars += write(1, str, _strlen(str));
+                    break;
+                case '%':
+                    printed_chars += write(1, "%", 1);
+                    break;
+                default:
+                    printed_chars += write(1, &format[i-1], 1);
+                    printed_chars += write(1, &format[i], 1);
+                    break;
             }
+        } else {
+            printed_chars += write(1, &format[i], 1);
         }
-        else
-        {
-            _putchar(*format);
-        }
-        format++;
+        i++;
     }
     va_end(args);
-    return(conteo);
+    return printed_chars;
 }
+
